@@ -1,0 +1,95 @@
+@model IEnumerable<SavingsClub.Models.Member>
+
+@{
+  // =========================================================================
+  // VIEW: Members / Index
+  // PROJECT: SavingsClub
+  // =========================================================================
+  // Displays a list of all members with profile image, name, and active status.
+  // Includes buttons for editing, deleting, and creating new members.
+  // Also handles temporary error messages (e.g., deletion restrictions).
+  // =========================================================================
+
+  ViewData["Title"] = "Members";
+}
+
+<!-- ================================================================ -->
+<!-- PAGE HEADER -->
+<!-- ================================================================ -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2>@ViewData["Title"]</h2>
+  <a class="btn btn-sm btn-primary" asp-action="Create">+ New Member</a>
+</div>
+
+<!-- ================================================================ -->
+<!-- ERROR MESSAGE -->
+<!-- ================================================================ -->
+@if (TempData["Error"] != null)
+{
+  <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- ================================================================ -->
+<!-- MEMBERS TABLE -->
+<!-- ================================================================ -->
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Active</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  @foreach (var m in Model)
+  {
+    <tr>
+      <!-- ==================================================== -->
+      <!-- PROFILE IMAGE -->
+      <!-- ==================================================== -->
+      <td>
+        @if (!string.IsNullOrEmpty(m.ImagePath))
+        {
+          <img src="@m.ImagePath"
+               alt="Profile photo"
+               style="width:44px;height:44px;object-fit:cover;border-radius:9999px;" />
+        }
+      </td>
+
+      <!-- ==================================================== -->
+      <!-- FULL NAME -->
+      <!-- ==================================================== -->
+      <td>@m.FullName</td>
+
+      <!-- ==================================================== -->
+      <!-- ACTIVE STATUS BADGE -->
+      <!-- ==================================================== -->
+      <td>
+        @if (m.IsActive)
+        {
+          <span class="badge bg-success">active</span>
+        }
+        else
+        {
+          <span class="badge bg-secondary">inactive</span>
+        }
+      </td>
+
+      <!-- ==================================================== -->
+      <!-- ACTION BUTTONS -->
+      <!-- ==================================================== -->
+      <td>
+        <a class="btn btn-sm btn-outline-primary"
+           asp-action="Edit"
+           asp-route-id="@m.Id">Edit</a>
+
+        <a class="btn btn-sm btn-outline-danger"
+           asp-action="Delete"
+           asp-route-id="@m.Id">Delete</a>
+      </td>
+    </tr>
+  }
+  </tbody>
+</table>

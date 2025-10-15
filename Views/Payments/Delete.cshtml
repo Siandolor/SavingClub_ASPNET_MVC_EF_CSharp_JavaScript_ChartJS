@@ -1,0 +1,40 @@
+@model SavingsClub.Models.Payment
+
+@{
+    // =========================================================================
+    // VIEW: Payments / Delete
+    // PROJECT: SavingsClub
+    // =========================================================================
+    // Displays a confirmation page before permanently deleting a payment record.
+    // Shows key payment details (date, member, amount, description) to ensure
+    // the user can verify correctness before deletion.
+    // =========================================================================
+
+    ViewData["Title"] = "Delete Payment";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- ================================================================ -->
+<!-- WARNING MESSAGE -->
+<!-- ================================================================ -->
+<div class="alert alert-warning">
+    <p>Are you sure you want to delete this payment?</p>
+
+    <ul>
+        <li><strong>Date:</strong> @Model.Date.ToString("dd.MM.yyyy")</li>
+        <li><strong>Member:</strong> @Model.Member?.FullName</li>
+        <li><strong>Amount:</strong> @(Model.IsIncome ? "+" : "−")@Model.Amount.ToString("0.00") €</li>
+        <li><strong>Description:</strong> @Model.Description</li>
+    </ul>
+</div>
+
+<!-- ================================================================ -->
+<!-- ACTION BUTTONS -->
+<!-- ================================================================ -->
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

@@ -1,0 +1,87 @@
+@model SavingsClub.Models.Member
+
+@{
+  // =========================================================================
+  // VIEW: Members / Create or Edit
+  // PROJECT: SavingsClub
+  // =========================================================================
+  // Displays a form for creating or editing a member profile.
+  // The same view is reused for both operations based on whether Model.Id != 0.
+  // Includes optional profile image upload and active status checkbox.
+  // =========================================================================
+
+  bool editing = Model.Id != 0;
+  ViewData["Title"] = editing ? "Edit Member" : "New Member";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- ===================================================================== -->
+<!-- MEMBER FORM -->
+<!-- ===================================================================== -->
+<form asp-action="@(editing ? "Edit" : "Create")"
+      method="post"
+      enctype="multipart/form-data">
+
+  @* Hidden ID field only in edit mode *@
+  @if (editing)
+  {
+    <input type="hidden" asp-for="Id" />
+  }
+
+  <!-- ================================================================ -->
+  <!-- FIRST NAME -->
+  <!-- ================================================================ -->
+  <div class="mb-3">
+    <label asp-for="FirstName" class="form-label"></label>
+    <input asp-for="FirstName" class="form-control" />
+    <span asp-validation-for="FirstName" class="text-danger"></span>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- LAST NAME -->
+  <!-- ================================================================ -->
+  <div class="mb-3">
+    <label asp-for="LastName" class="form-label"></label>
+    <input asp-for="LastName" class="form-control" />
+    <span asp-validation-for="LastName" class="text-danger"></span>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROFILE IMAGE -->
+  <!-- ================================================================ -->
+  <div class="mb-3">
+    <label class="form-label">Profile Image (optional)</label>
+    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+      <div class="mt-2">
+        <img src="@Model.ImagePath"
+             style="height:80px;border-radius:8px;object-fit:cover;"
+             alt="Current profile photo" />
+      </div>
+    }
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ACTIVE STATUS -->
+  <!-- ================================================================ -->
+  <div class="mb-3 form-check">
+    <input type="checkbox" class="form-check-input" asp-for="IsActive" />
+    <label class="form-check-label" asp-for="IsActive"></label>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ACTION BUTTONS -->
+  <!-- ================================================================ -->
+  <button class="btn btn-primary" type="submit">Save</button>
+  <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<!-- ===================================================================== -->
+<!-- VALIDATION SCRIPTS -->
+<!-- ===================================================================== -->
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

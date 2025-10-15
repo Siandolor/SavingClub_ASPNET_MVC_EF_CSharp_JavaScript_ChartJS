@@ -1,0 +1,42 @@
+@model SavingsClub.Models.Member
+
+@{
+    // =========================================================================
+    // VIEW: Members / Delete
+    // PROJECT: SavingsClub
+    // =========================================================================
+    // Displays a confirmation screen before deleting a member.
+    // Deletion is only permitted if the member has no related payments.
+    // Otherwise, the member should be marked as inactive instead.
+    // =========================================================================
+
+    ViewData["Title"] = "Delete Member";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- ================================================================ -->
+<!-- WARNING MESSAGE -->
+<!-- ================================================================ -->
+<div class="alert alert-warning">
+    <p>Are you sure you want to delete this member?</p>
+
+    <ul>
+        <li><strong>Name:</strong> @Model.FullName</li>
+        <li><strong>Status:</strong> @(Model.IsActive ? "active" : "inactive")</li>
+    </ul>
+
+    <p class="mb-0">
+        <em>Note: Deletion is only possible if no payments exist.  
+            Alternatively, you can mark the member as inactive instead.</em>
+    </p>
+</div>
+
+<!-- ================================================================ -->
+<!-- CONFIRMATION FORM -->
+<!-- ================================================================ -->
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

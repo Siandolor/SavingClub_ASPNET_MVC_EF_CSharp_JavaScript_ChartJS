@@ -1,0 +1,151 @@
+﻿@model IEnumerable<SavingsClub.Models.Payment>
+@{
+    // =========================================================================
+    // VIEW: Home / Index
+    // PROJECT: SavingsClub
+    // =========================================================================
+    // Displays the application’s main entry point. 
+    // Provides navigation cards for Members, Payments, and Statistics,
+    // plus a compact overview table of the most recent payments.
+    // =========================================================================
+
+    ViewData["Title"] = "Home";
+}
+
+<div class="container py-5">
+
+    <!-- ================================================================ -->
+    <!-- HEADER SECTION -->
+    <!-- ================================================================ -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Welcome to the <span class="text-primary"><i>Savings Club</i></span></h1>
+        <p class="lead text-muted">Select what you would like to do</p>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- FEATURE CARDS: MEMBERS | PAYMENTS | STATISTICS -->
+    <!-- ================================================================ -->
+    <div class="row g-4 justify-content-center mb-5">
+
+        <!-- MEMBERS CARD -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body d-flex flex-column text-center p-3" style="font-size:0.85em;">
+                    <i class="bi bi-people text-primary mb-2" style="font-size:2rem;"></i>
+                    <h5 class="card-title mb-2">Members</h5>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted m-0">Manage all club members</p>
+                        <p class="card-text text-muted m-0">activate/deactivate profiles and upload images.</p>
+                    </div>
+                    <a class="btn btn-sm btn-primary text-light mt-3"
+                       asp-controller="Members" asp-action="Index">
+                        Manage Members
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENTS CARD -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body d-flex flex-column text-center p-3" style="font-size:0.85em;">
+                    <i class="bi bi-cash-stack text-success mb-2" style="font-size:2rem;"></i>
+                    <h5 class="card-title mb-2">Payments</h5>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted m-0">Record and edit income and expenses</p>
+                        <p class="card-text text-muted m-0">always keep track of the cash balance.</p>
+                    </div>
+                    <a class="btn btn-sm btn-success text-light mt-3"
+                       asp-controller="Payments" asp-action="Index">
+                        Manage Payments
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATISTICS CARD -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body d-flex flex-column text-center p-3" style="font-size:0.85em;">
+                    <i class="bi bi-bar-chart-line text-info mb-2" style="font-size:2rem;"></i>
+                    <h5 class="card-title mb-2">Statistics</h5>
+                    <div class="flex-grow-1">
+                        <p class="card-text text-muted m-0">Analyze income and expenses</p>
+                        <p class="card-text text-muted m-0">by date range or by member</p>
+                        <p class="card-text text-muted m-0">with clear and simple charts.</p>
+                    </div>
+                    <a class="btn btn-sm btn-info text-dark mt-3"
+                       asp-controller="Stats" asp-action="Index">
+                        View Statistics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- FILTER BAR -->
+    <!-- ================================================================ -->
+    <div class="mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       placeholder="Search description..." class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <select name="isIncome" class="form-select" asp-items="ViewBag.IsIncomeList"></select>
+            </div>
+            <div class="col-md-3">
+                <select name="memberId" class="form-select" asp-items="ViewBag.MemberList">
+                    <option value="">— all members —</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="limit" class="form-select" asp-items="ViewBag.LimitList"></select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- RECENT PAYMENTS TABLE -->
+    <!-- ================================================================ -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title mb-3">Recent Payments</h4>
+            <table class="table table-striped align-middle">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@p.Date.ToString("dd.MM.yyyy")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(p.Member?.ImagePath))
+                            {
+                                <img src="@Url.Content(p.Member.ImagePath)" alt="Photo"
+                                     width="32" height="32"
+                                     class="rounded-circle me-2" />
+                            }
+                            @p.Member?.FullName
+                        </td>
+                        <td class="@(p.IsIncome ? "text-success fw-bold" : "text-danger fw-bold")">
+                            @(p.IsIncome ? "+" : "−")@p.Amount.ToString("N2") €
+                        </td>
+                        <td>@p.Description</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+@model PaymentsIndexViewModel
+
+@{
+    // =========================================================================
+    // VIEW: Payments / Index
+    // PROJECT: SavingsClub
+    // =========================================================================
+    // Displays a searchable and filterable overview of all payments.
+    // Includes filters for member, income/expense type, and list size.
+    // Provides navigation to create, edit, or delete individual payment entries.
+    // =========================================================================
+
+    ViewData["Title"] = "Payments";
+}
+
+<h2>All Payments</h2>
+
+<!-- ================================================================ -->
+<!-- NEW PAYMENT BUTTON -->
+<!-- ================================================================ -->
+<p>
+    <a class="btn btn-success" asp-action="Create">+ New Payment</a>
+</p>
+
+<!-- ================================================================ -->
+<!-- FILTER FORM -->
+<!-- ================================================================ -->
+<form method="get" class="row g-3 mb-3">
+    <!-- SEARCH BAR -->
+    <div class="col-md-3">
+        <input type="text" asp-for="SearchTerm" class="form-control" placeholder="Search by description..." />
+    </div>
+
+    <!-- MEMBER FILTER -->
+    <div class="col-md-3">
+        <select asp-for="MemberId" asp-items="Model.Members" class="form-select">
+            <option value="">-- All Members --</option>
+        </select>
+    </div>
+
+    <!-- TRANSACTION TYPE FILTER -->
+    <div class="col-md-2">
+        <select asp-for="IsIncome" class="form-select">
+            <option value="">-- All Transactions --</option>
+            <option value="true">Only Incomes</option>
+            <option value="false">Only Expenses</option>
+        </select>
+    </div>
+
+    <!-- RECORD LIMIT -->
+    <div class="col-md-2">
+        <select asp-for="PageSize" class="form-select">
+            <option value="0" selected="@(Model.PageSize == 0)">All</option>
+            <option value="15" selected="@(Model.PageSize == 15)">Last 15</option>
+            <option value="30" selected="@(Model.PageSize == 30)">Last 30</option>
+        </select>
+    </div>
+
+    <!-- FILTER BUTTON -->
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+<!-- ================================================================ -->
+<!-- PAYMENTS TABLE -->
+<!-- ================================================================ -->
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Member</th>
+        <th>Amount</th>
+        <th>Description</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model.Payments)
+    {
+        <tr>
+            <td>@p.Date.ToString("dd.MM.yyyy")</td>
+            <td>@p.Member?.FullName</td>
+            <td class="@(p.IsIncome ? "text-success fw-bold" : "text-danger fw-bold")">
+                @(p.IsIncome ? "+" : "−")@p.Amount.ToString("N2") €
+            </td>
+            <td>@p.Description</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.Id">Edit</a>
+                <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

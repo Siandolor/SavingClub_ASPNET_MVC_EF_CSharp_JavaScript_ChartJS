@@ -1,0 +1,215 @@
+@model SavingsClub.ViewModels.StatsViewModel
+@using System.Text.Json
+
+@{
+    // =========================================================================
+    // VIEW: Stats / Index
+    // PROJECT: SavingsClub
+    // =========================================================================
+    // Displays statistical summaries and visualizations for the savings club.
+    // Includes total income, expenses, balance, and filtered analysis by date
+    // range or member. Also renders a Top-5 bar chart using Chart.js.
+    // =========================================================================
+
+    ViewData["Title"] = "Statistics";
+    string DataJson = JsonSerializer.Serialize(Model.Top5Mixed.Select(x => new { x.Label, x.Value }));
+}
+
+<h2>Statistics</h2>
+
+<!-- ================================================================ -->
+<!-- GLOBAL OVERVIEW -->
+<!-- ================================================================ -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="summary-tile">
+            <h3>Income</h3>
+            <div class="num">@Model.Overview.SumIncome.ToString("N2") €</div>
+            <div class="small-muted">@Model.Overview.CountIncome records</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="summary-tile">
+            <h3>Expenses</h3>
+            <div class="num">@Model.Overview.SumExpense.ToString("N2") €</div>
+            <div class="small-muted">@Model.Overview.CountExpense records</div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="summary-tile">
+            <h3>Balance</h3>
+            <div class="num">@Model.Overview.Balance.ToString("N2") €</div>
+            <div class="small-muted">@Model.Overview.CountAll total records</div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<!-- ================================================================ -->
+<!-- FILTER SECTION -->
+<!-- ================================================================ -->
+<h4 class="mb-3">Filter by Date / Member</h4>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <label class="form-label">From</label>
+        <input name="from" type="date" class="form-control" value="@(Model.Filter.From?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">To</label>
+        <input name="to" type="date" class="form-control" value="@(Model.Filter.To?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Member</label>
+        <select name="memberId" class="form-select">
+            <option value="">— All —</option>
+            @foreach (var m in Model.Filter.Members ?? Enumerable.Empty<SelectListItem>())
+            {
+                <option value="@m.Value" selected="@(Model.Filter.MemberId?.ToString()==m.Value ? "selected" : null)">
+                    @m.Text
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-secondary w-100" type="submit">Apply</button>
+    </div>
+</form>
+
+<!-- ================================================================ -->
+<!-- FILTERED RESULTS (IF ACTIVE) -->
+<!-- ================================================================ -->
+@if (Model.Filtered != null)
+{
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="summary-tile">
+                <h3>Income (Filtered)</h3>
+                <div class="num">@Model.Filtered.SumIncome.ToString("N2") €</div>
+                <div class="small-muted">@Model.Filtered.CountIncome records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="summary-tile">
+                <h3>Expenses (Filtered)</h3>
+                <div class="num">@Model.Filtered.SumExpense.ToString("N2") €</div>
+                <div class="small-muted">@Model.Filtered.CountExpense records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="summary-tile">
+                <h3>Balance (Filtered)</h3>
+                <div class="num">@Model.Filtered.Balance.ToString("N2") €</div>
+                <div class="small-muted">@Model.Filtered.CountAll records</div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ================================================================ -->
+<!-- TOP 5 TRANSACTIONS CHART -->
+<!-- ================================================================ -->
+<h5 class="mt-4">Top 5 Incomes and Expenses (updated by filter)</h5>
+
+<canvas id="top5Chart" width="400" height="260"></canvas>
+
+<!-- ================================================================ -->
+<!-- JAVASCRIPT SECTION -->
+<!-- ================================================================ -->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        // --------------------------------------------------------------------
+        // GLOBAL CHART INSTANCE
+        // --------------------------------------------------------------------
+        let chart;
+
+        // --------------------------------------------------------------------
+        // FUNCTION: buildChart
+        // --------------------------------------------------------------------
+        // Builds or updates the bar chart visualization.
+        // Colors: green for positive (income), red for negative (expense).
+        // --------------------------------------------------------------------
+        function buildChart(data) {
+            const labels = data.map(d => d.label);
+            const values = data.map(d => d.value);
+            const colors = values.map(v => v >= 0 ? "rgba(0,200,0,0.7)" : "rgba(200,0,0,0.7)");
+
+            if (chart) chart.destroy();
+
+            const ctx = document.getElementById('top5Chart');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Amounts',
+                        data: values,
+                        backgroundColor: colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const val = ctx.parsed.y;
+                                    return (val >= 0 ? '+' : '') +
+                                        val.toLocaleString("en-US", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + ' €';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (v) => {
+                                    return (v >= 0 ? '+' : '') +
+                                        Number(v).toLocaleString("en-US", { minimumFractionDigits: 0 }) +
+                                        ' €';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --------------------------------------------------------------------
+        // FUNCTION: loadChart
+        // --------------------------------------------------------------------
+        // Fetches filtered chart data from the backend and rebuilds the chart.
+        // --------------------------------------------------------------------
+        async function loadChart() {
+            const params = new URLSearchParams(new FormData(document.querySelector("form")));
+            const response = await fetch("/Stats/ChartData?" + params.toString());
+            const data = await response.json();
+            buildChart(data);
+        }
+
+        // --------------------------------------------------------------------
+        // EVENT: PAGE LOAD & FORM SUBMIT
+        // --------------------------------------------------------------------
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChart();
+            document.querySelector("form").addEventListener("submit", e => {
+                e.preventDefault();
+                loadChart();
+            });
+        });
+    </script>
+}
