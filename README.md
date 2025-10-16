@@ -137,16 +137,29 @@ The database (`SavingClub.db`) will be created automatically on first run.
 
 ---
 
-## License
-Licensed under the **MIT License**.  
-© 2025 Daniel Fitz  
-
----
-
 ## Notes
 - Educational and demonstrative project — easily portable or extendable.  
 - Uses clear comment sections (`// =====`) throughout for maintainability.  
-- Focused on simplicity, transparency, and data integrity.  
+- Focused on simplicity, transparency, and data integrity.
+
+---
+
+## Author
+**Daniel Fitz, MBA, MSc, BSc**  
+Vienna, Austria  
+Developer & Security Technologist — *Post-Quantum Cryptography, Blockchain/Digital Ledger & Simulation*  
+C/C++ · C# · Java · Python · Visual Basic · ABAP · JavaScript/TypeScript
+
+International Accounting · Macroeconomics & International Relations · Physiotherapy · Computer Sciences  
+Former Officer of the German Federal Armed Forces
+
+---
+
+## License
+**MIT License** — free for educational and research use.  
+Attribution required for redistribution or commercial adaptation.
+
+---
 
 > “SavingClub – because community wealth grows when managed together.”  
 > — Daniel Fitz, 2025
